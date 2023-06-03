@@ -2,6 +2,7 @@
 import streamlit as st
 import pandas as pd
 import base64
+import io
 
 # Streamlit 앱 시작
 def app():
@@ -34,18 +35,14 @@ def app():
         st.write(summary)
         st.write(scorecard)
 
-      import io
+        # 스코어카드와 요약을 합치기
+        full_scorecard = pd.concat([summary, scorecard], axis=1)
 
-# 스코어카드와 요약을 합치기
-full_scorecard = pd.concat([summary, scorecard], axis=1)
-
-csv_buffer = io.StringIO()
-full_scorecard.to_csv(csv_buffer, index=True, encoding='utf-8-sig')
-csv_string = csv_buffer.getvalue()
-b64 = base64.b64encode(csv_string.encode()).decode() 
-href = f'<a href="data:file/csv;base64,{b64}" download="scorecard.csv">Download CSV File</a>'
-st.markdown(href, unsafe_allow_html=True)
-
+        csv_buffer = io.StringIO()
+        full_scorecard.to_csv(csv_buffer, index=True, encoding='utf-8-sig')
+        csv_string = csv_buffer.getvalue()
+        b64 = base64.b64encode(csv_string.encode()).decode() 
+        href = f'<a href="data:file/csv;base64,{b64}"
 
 if __name__ == "__main__":
     app()
