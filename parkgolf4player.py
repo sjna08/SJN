@@ -26,15 +26,18 @@ def app():
 
     # 입력 받은 정보를 표시하고 다운로드 받기
     if st.button('제출'):
-        summary = pd.DataFrame(index=players, columns=['총점', 'A홀점수', 'B홀점수'])
+        summary = pd.DataFrame(index=players, columns=['총점', '전반 점수', '후반 점수'])
         summary['A홀점수'] = scorecard.iloc[:, :9].sum(axis=1)
-        summary['B홀점수'] = scorecard.iloc[:, 9:].sum(axis=1)
+        summary['B홀 점수'] = scorecard.iloc[:, 9:].sum(axis=1)
         summary['총점'] = summary['A홀점수'] + summary['B홀점수']
 
         st.write(summary)
         st.write(scorecard)
 
-        csv = scorecard.to_csv(index=False)
+        # 스코어카드와 요약을 합치기
+        full_scorecard = pd.concat([summary, scorecard], axis=1)
+
+        csv = full_scorecard.to_csv(index=True)
         b64 = base64.b64encode(csv.encode()).decode() 
         href = f'<a href="data:file/csv;base64,{b64}" download="scorecard.csv">Download CSV File</a>'
         st.markdown(href, unsafe_allow_html=True)
