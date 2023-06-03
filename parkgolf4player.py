@@ -34,13 +34,18 @@ def app():
         st.write(summary)
         st.write(scorecard)
 
-        # 스코어카드와 요약을 합치기
-        full_scorecard = pd.concat([summary, scorecard], axis=1)
+      import io
 
-        csv = full_scorecard.to_csv(index=True)
-        b64 = base64.b64encode(csv.encode()).decode() 
-        href = f'<a href="data:file/csv;base64,{b64}" download="scorecard.csv">Download CSV File</a>'
-        st.markdown(href, unsafe_allow_html=True)
+# 스코어카드와 요약을 합치기
+full_scorecard = pd.concat([summary, scorecard], axis=1)
+
+csv_buffer = io.StringIO()
+full_scorecard.to_csv(csv_buffer, index=True, encoding='utf-8-sig')
+csv_string = csv_buffer.getvalue()
+b64 = base64.b64encode(csv_string.encode()).decode() 
+href = f'<a href="data:file/csv;base64,{b64}" download="scorecard.csv">Download CSV File</a>'
+st.markdown(href, unsafe_allow_html=True)
+
 
 if __name__ == "__main__":
     app()
