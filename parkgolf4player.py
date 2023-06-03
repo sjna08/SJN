@@ -22,9 +22,9 @@ def app():
 
     # 입력 받은 정보를 표시하기
     if st.button('제출'):
-        scorecard['전반 점수'] = scorecard.iloc[:, :9].sum(axis=1)
-        scorecard['후반 점수'] = scorecard.iloc[:, 9:18].sum(axis=1)
-        scorecard['총점'] = scorecard['전반 점수'] + scorecard['후반 점수']
+        scorecard['A홀 점수'] = scorecard.iloc[:, :9].sum(axis=1)
+        scorecard['B홀 점수'] = scorecard.iloc[:, 9:18].sum(axis=1)
+        scorecard['총점'] = scorecard['A홀 점수'] + scorecard['B홀 점수']
 
         st.write(scorecard)
 
