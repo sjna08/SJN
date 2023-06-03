@@ -25,10 +25,12 @@ def app():
 
     # 입력 받은 정보를 표시하기
     if st.button('제출'):
-        scorecard['A홀 점수'] = scorecard.iloc[:, :9].sum(axis=1)
-        scorecard['B홀 점수'] = scorecard.iloc[:, 9:].sum(axis=1)
-        scorecard['총점'] = scorecard['A홀 점수'] + scorecard['B홀 점수']
+        summary = pd.DataFrame(index=players, columns=['총점', 'A홀점수', 'B홀점수'])
+        summary['A홀점수'] = scorecard.iloc[:, :9].sum(axis=1)
+        summary['B홀점수'] = scorecard.iloc[:, 9:].sum(axis=1)
+        summary['총점'] = summary['A홀점수'] + summary['B홀점수']
 
+        st.write(summary)
         st.write(scorecard)
 
 if __name__ == "__main__":
