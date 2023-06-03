@@ -1,6 +1,7 @@
 # 필요한 라이브러리 불러오기
 import streamlit as st
 import pandas as pd
+import base64
 
 # Streamlit 앱 시작
 def app():
@@ -23,7 +24,7 @@ def app():
         for player in players:
             scorecard.loc[player, hole] = st.number_input(f'{player} {hole} 점수', min_value=0, value=0, key=f'{player}_{hole}')
 
-    # 입력 받은 정보를 표시하기
+    # 입력 받은 정보를 표시하고 다운로드 받기
     if st.button('제출'):
         summary = pd.DataFrame(index=players, columns=['총점', 'A홀점수', 'B홀점수'])
         summary['A홀점수'] = scorecard.iloc[:, :9].sum(axis=1)
@@ -32,6 +33,11 @@ def app():
 
         st.write(summary)
         st.write(scorecard)
+
+        csv = scorecard.to_csv(index=False)
+        b64 = base64.b64encode(csv.encode()).decode() 
+        href = f'<a href="data:file/csv;base64,{b64}" download="scorecard.csv">Download CSV File</a>'
+        st.markdown(href, unsafe_allow_html=True)
 
 if __name__ == "__main__":
     app()
