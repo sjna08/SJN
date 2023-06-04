@@ -4,6 +4,8 @@ import pandas as pd
 import base64
 import io
 
+# Main Page
+st.title("South America Trip Planner")
 # Streamlit 앱 시작
 def app():
     # 플레이어 수 설정
