@@ -5,7 +5,8 @@ import base64
 import io
 
 # Main Page
-st.title("ParkGolf ScoreCard")
+st.title("ParkGolf ScoreCard
+for 18 holes")
 
 # Streamlit 앱 시작
 def app():
