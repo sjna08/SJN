@@ -55,8 +55,7 @@ for hole in holes:
              'B1_Par3(69m)', 'B2_Par4(100m)', 'B3_Par4(68m)', 'B4_Par3(50m)', 
              'B5_Par4(58m)', 'B6_Par3(55m)', 'B7_Par4(71m)', 'B8_Par5(123m)', 'B9_Par3(66m)']
 
-    for hole in holes:
-        # 이 부분에 원하는 코드를 추가하세요.
+    
         # 차이를 계산
         summary['A_Dif'] = summary['A'] - 33
         summary['B_Dif'] = summary['B'] - 33
