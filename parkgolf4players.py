@@ -35,15 +35,7 @@ def app():
         summary['A'] = scorecard.iloc[:, :9].sum(axis=1)
         summary['B'] = scorecard.iloc[:, 9:].sum(axis=1)
         summary['TTL'] = summary['A'] + summary['B']
-
-         def app():
-    # 홀 이름과 거리 설정
-    holes = ['A1_Par4(60m)', 'A2_Par3(40m)', 'A3_Par3(65m)', 'A4_Par4(100m)', 
-             'A5_Par5(130m)', 'A6_Par4(72m)', 'A7_Par4(81m)', 'A8_Par3(50m)', 'A9_Par3(50m)', 
-             'B1_Par3(69m)', 'B2_Par4(100m)', 'B3_Par4(68m)', 'B4_Par3(50m)', 
-             'B5_Par4(58m)', 'B6_Par3(55m)', 'B7_Par4(71m)', 'B8_Par5(123m)', 'B9_Par3(66m)']
-
-    
+   
         # 차이를 계산
         summary['A_Dif'] = summary['A'] - 33
         summary['B_Dif'] = summary['B'] - 33
