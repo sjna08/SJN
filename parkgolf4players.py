@@ -29,7 +29,7 @@ def app():
 
     # 입력 받은 정보를 표시하고 다운로드 받기
     if st.button('제출'):
-        summary = pd.DataFrame(index=players, columns=['TTL', 'A_ttl', 'B_ttl', 'A_Dif', 'B_Dif', 'TTL_Dif'])
+        summary = pd.DataFrame(index=players, columns=['TTL','A_ttl','B_ttl', 'A_Dif','B_Dif','TTL_Dif'])
         summary['A_ttl'] = scorecard.iloc[:, :9].sum(axis=1)
         summary['B_ttl'] = scorecard.iloc[:, 9:].sum(axis=1)
         summary['TTL'] = summary['A_ttl'] + summary['B_ttl']
