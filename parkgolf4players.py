@@ -35,8 +35,8 @@ def app():
         summary['TTL'] = summary['A'] + summary['B']
 
         # 차이를 계산
-        summary['A_Dif'] = summary['A_ttl'] - 33
-        summary['B_Dif'] = summary['B_ttl'] - 33
+        summary['A_Dif'] = summary['A'] - 33
+        summary['B_Dif'] = summary['B'] - 33
         summary['TTL_Dif'] = summary['TTL'] - 66
 
         st.write(summary)
