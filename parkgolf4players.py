@@ -27,10 +27,15 @@ def app():
 
     # 입력 받은 정보를 표시하고 다운로드 받기
     if st.button('제출'):
-        summary = pd.DataFrame(index=players, columns=['Total', 'A_total', 'B_total'])
+        summary = pd.DataFrame(index=players, columns=['Total', 'A_total', 'B_total', 'A_Diff', 'B_Diff', 'Total_Diff'])
         summary['A_total'] = scorecard.iloc[:, :9].sum(axis=1)
         summary['B_total'] = scorecard.iloc[:, 9:].sum(axis=1)
         summary['Total'] = summary['A_total'] + summary['B_total']
+
+        # 차이를 계산
+        summary['A_Diff'] = summary['A_total'] - 33
+        summary['B_Diff'] = summary['B_total'] - 33
+        summary['Total_Diff'] = summary['Total'] - 66
 
         st.write(summary)
         st.write(scorecard)
