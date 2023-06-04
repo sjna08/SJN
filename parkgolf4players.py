@@ -5,7 +5,7 @@ import base64
 import io
 
 # Main Page
-st.title("Park Golf Score Card Planner")
+st.title("Park Golf Score Card")
 # Streamlit 앱 시작
 def app():
     # 플레이어 수 설정
