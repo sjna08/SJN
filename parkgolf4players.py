@@ -29,15 +29,15 @@ def app():
 
     # 입력 받은 정보를 표시하고 다운로드 받기
     if st.button('제출'):
-        summary = pd.DataFrame(index=players, columns=['TTL', 'A_ttl', 'B_ttl', 'A_Diff', 'B_Diff', 'TTL_Diff'])
+        summary = pd.DataFrame(index=players, columns=['TTL', 'A_ttl', 'B_ttl', 'A_Dif', 'B_Dif', 'TTL_Dif'])
         summary['A_ttl'] = scorecard.iloc[:, :9].sum(axis=1)
         summary['B_ttl'] = scorecard.iloc[:, 9:].sum(axis=1)
         summary['TTL'] = summary['A_ttl'] + summary['B_ttl']
 
         # 차이를 계산
-        summary['A_Diff'] = summary['A_ttl'] - 33
-        summary['B_Diff'] = summary['B_ttl'] - 33
-        summary['TTL_Diff'] = summary['TTL'] - 66
+        summary['A_Dif'] = summary['A_ttl'] - 33
+        summary['B_Dif'] = summary['B_ttl'] - 33
+        summary['TTL_Dif'] = summary['TTL'] - 66
 
         st.write(summary)
         st.write(scorecard)
