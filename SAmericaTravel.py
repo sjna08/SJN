@@ -64,13 +64,30 @@ author_profile: false
 prompt_example = f'''Write blog posts in markdown format.
 Write the theme of your blog as "<<TOPIC>>" and its category is "<<CATEGORY>>".
 Highlight, bold, or italicize important words or sentences.
-I would like to travel to South America from Incheon Airport in Korea. The number of people departing is 8 in 4 teams of couples. I am around 70 years old and I plan to travel around 30 days from February 19, 2024. In particular, there is a woman in the group who has been undergoing artificial joint surgery on both knees for about a year, so we would like to secure a suitable schedule for hiking and walking. I would like to prepare the following information to prepare for the trip during this period.  If you divide the content into categories
+I would like to travel to South America from Incheon Airport in Korea. The number 
+of people departing is 8 in 4 teams of couples. I am around 70 years old and I 
+plan to travel around 30 days from February 19, 2024. In particular, there is 
+a woman in the group who has been undergoing artificial joint surgery on both 
+knees for about a year, so we would like to secure a suitable schedule for 
+hiking and walking. I would like to prepare the following information to 
+prepare for the trip during this period.  If you divide the content into 
+categories
 1. We would like to review the appropriateness of the travel schedule. (Itinerary)
-2. Please let us know the local situation of the travel destination in detail about the weather, clothes, preparation of household medicine, necessary knowledge, and other supplies according to the travel schedule.(Visiting City)
-3. Transportation schedule, especially for flight schedule, please divide the departure and arrival schedule into eco class and business class, and inform the time interval and fare of the transportation method and the time interval of the relevant transportation method if transition is inevitable.
+2. Please let us know the local situation of the travel destination in detail about 
+the weather, clothes, preparation of household medicine, necessary knowledge, and 
+other supplies according to the travel schedule.(Visiting City)
+3. Transportation schedule, especially for flight schedule, please divide the 
+departure and arrival schedule into eco class and business class, and inform 
+the time interval and fare of the transportation method and the time interval of 
+the relevant transportation method if transition is inevitable.
 For the flight schedule, please make a schedule like a sky scanner.(Transportation)
-4. Please tell us the cost of dividing the hotel into 3 star and 4 star, and recommend an accommodation hotel according to the recommended travel schedule, and also tell us the distance from the airport and the time it takes by car.(Hotel)
-5. Please introduce 10 restaurants at the destination you visit, and please tell us the name of the restaurant, address, contact information, popular menu, and cost of eating for 8 people, and recommend whether the restaurant is suitable for lunch or dinner.(Restaurant)
+4. Please tell us the cost of dividing the hotel into 3 star and 4 star, and 
+recommend an accommodation hotel according to the recommended travel schedule, 
+and also tell us the distance from the airport and the time it takes by car.(Hotel)
+5. Please introduce 10 restaurants at the destination you visit, and please tell us 
+the name of the restaurant, address, contact information, popular menu, and cost of 
+eating for 8 people, and recommend whether the restaurant is suitable for lunch or 
+dinner.(Restaurant)
 Please make the entire blog less than 20 minutes long.
 Create several hashtags and add them only at the end of the line.
 Add a summary of the entire article at the beginning of the blog post.'''
