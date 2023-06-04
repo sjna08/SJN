@@ -18,8 +18,8 @@ for hole in holes:
     # 이 부분에 원하는 코드를 추가하세요.
     # 플레이어 수 설정
     num_players = 4
-    #players = [st.sidebar.text_input(f'Player {i+1}이름',value=f'Player{i+1}') for i in range(num_players)]
-    players = [st.sidebar.text_input(f'Player {i+1}이름') for i in range(num_players)] 
+    players = [st.sidebar.text_input(f'Player {i+1}이름',value=f'Player{i+1}') for i in range(num_players)]
+  
     for i, player in enumerate(players):
       for hole in holes:
           key = f"{player}_{hole}_{i}"  # player index 추가
