@@ -12,7 +12,12 @@ def app():
     # 플레이어 수 설정
     num_players = 4
     #players = [st.sidebar.text_input(f'Player {i+1}이름',value=f'Player{i+1}') for i in range(num_players)]
-    players = [st.sidebar.text_input(f'Player {i+1}이름') for i in range(num_players)]
+    players = [st.sidebar.text_input(f'Player {i+1}이름') for i in range(num_players)] 
+    for i, player in enumerate(players):
+    for hole in holes:
+        key = f"{player}_{hole}_{i}"  # player index 추가
+        scorecard.loc[player, hole] = st.number_input(f'{player} {hole} 점수', min_value=0, value=0, key=key)
+
 
     # 홀 이름과 거리 설정
     holes = ['A1_Par4(60m)', 'A2_Par3(40m)', 'A3_Par3(65m)', 'A4_Par4(100m)', 
