@@ -40,4 +40,6 @@ scorecard = st.session_state['scorecard']
 for hole in selected_holes:
     st.subheader(hole)
     for player in players:
-        scorecard.loc[player, hole] = st.number_input(f'{player} {hole} 점수', min_value=0, value=(scorecard.loc[player, hole] if pd.notna(scorecard.loc[player, hole]) else 0), key=f'{player}_{hole}')
+        if pd.isna(scorecard.loc[player, hole]):
+            scorecard.loc[player, hole] = 0
+        scorecard.loc[player, hole] = st.number_input(f'{player} {hole} 점수', min_value=0, value=int(scorecard.loc[player, hole]), key=f'{player}_{hole}_{page}')
