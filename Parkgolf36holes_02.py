@@ -33,13 +33,11 @@ else:
 
 # 스코어카드 생성
 if 'scorecard' not in st.session_state:
-    st.session_state['scorecard'] = pd.DataFrame(index=players, columns=holes)
+    st.session_state['scorecard'] = pd.DataFrame(0, index=players, columns=holes)
 scorecard = st.session_state['scorecard']
 
 # 사용자에게 입력 받기
 for hole in selected_holes:
     st.subheader(hole)
     for player in players:
-        scorecard.loc[player, hole] = st.number_input(f'{player} {hole} 점수', min_value=0, value=scorecard.loc[player, hole], key=f'{player}_{hole}')
-
-# 입력 받은 정보를 표시하고 다운로드 받기
+        scorecard.loc[player, hole] = st.number_input(f'{player} {hole} 점수', min
