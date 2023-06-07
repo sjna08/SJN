@@ -1,3 +1,4 @@
+#Parkgolf36holes_02.py와 와전 동일한 코딩입니다
 def app():
     import streamlit as st
     import pandas as pd
