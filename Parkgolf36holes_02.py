@@ -3,7 +3,6 @@ def app():
     import pandas as pd
     import base64
     import io
-    import os
 
     st.title("ParkGolf ScoreCard")
 
@@ -29,26 +28,25 @@ def app():
     else:
         selected_holes = holes
 
-    # 점수카드가 없거나, 새로운 점수카드를 생성하는 버튼이 눌렸다면 새로운 점수카드를 생성합니다.
-    if 'scorecard' not in st.session_state or st.button("새로운 점수카드 생성"):
+    # Create or load scorecard
+    if 'scorecard' not in st.session_state:
         st.session_state['scorecard'] = pd.DataFrame(index=players, columns=holes)
-    
-    # 저장된 점수카드를 불러오는 버튼이 눌렸다면, 저장된 점수카드를 불러옵니다.
-    if st.button("저장된 점수카드 불러오기"):
+    elif st.button("저장된 점수카드 불러오기"):
         st.session_state['scorecard'] = pd.read_csv('scorecard.csv', index_col=0)
     scorecard = st.session_state['scorecard']
 
     for hole in selected_holes:
         st.subheader(hole)
         for player in players:
-            scorecard.loc[player, hole] = st.number_input(f'{player} {hole} 점수', min_value=0, value=0, key=f'{player}_{hole}', format="%d")
+            score = st.number_input(f'{player} {hole} 점수', min_value=0, value=scorecard.loc[player, hole], key=f'{player}_{hole}', format="%d")
+            scorecard.loc[player, hole] = int(score)
 
     if st.button('제출'):
         summary = pd.DataFrame(index=players, columns=['TTL','A','B', 'A_Dif','B_Dif','C','D', 'C_Dif','D_Dif','TTL_Dif'])
-        summary['A'] = scorecard.iloc[:, :9].sum(axis=1)
-        summary['B'] = scorecard.iloc[:, 9:18].sum(axis=1)
-        summary['C'] = scorecard.iloc[:, 18:27].sum(axis=1)
-        summary['D'] = scorecard.iloc[:, 27:].sum(axis=1)
+        summary['A'] = scorecard.iloc[:, :9].astype(int).sum(axis=1)
+        summary['B'] = scorecard.iloc[:, 9:18].astype(int).sum(axis=1)
+        summary['C'] = scorecard.iloc[:, 18:27].astype(int).sum(axis=1)
+        summary['D'] = scorecard.iloc[:, 27:].astype(int).sum(axis=1)
         summary['TTL'] = summary['A'] + summary['B'] + summary['C'] + summary['D']
 
         summary['A_Dif'] = summary['A'] - 33
@@ -68,9 +66,9 @@ def app():
         b64 = base64.b64encode(csv_string.encode()).decode() 
         href = f'<a href="data:file/csv;base64,{b64}" download="scorecard.csv">Download CSV File</a>'
         st.markdown(href, unsafe_allow_html=True)
-
-        # Save the scorecard
-        full_scorecard.to_csv('scorecard.csv')
+        
+        if st.button("점수카드 저장"):
+            scorecard.to_csv('scorecard.csv')
 
 if __name__ == "__main__":
    app()
