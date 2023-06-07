@@ -63,13 +63,13 @@ def app():
         summary['D_Dif'] = summary['D'] - 33
         summary['TTL_Dif'] = summary['TTL'] - 132
 
-        st.write(summary)
-        st.write(scorecard)
+        st.write(summary.astype(int))
+        st.write(scorecard.astype(int))
 
         full_scorecard = pd.concat([summary, scorecard], axis=1)
 
         csv_buffer = io.StringIO()
-        full_scorecard.to_csv(csv_buffer, index=True, encoding='utf-8-sig')
+        full_scorecard.astype(int).to_csv(csv_buffer, index=True, encoding='utf-8-sig')
         csv_string = csv_buffer.getvalue()
         b64 = base64.b64encode(csv_string.encode()).decode() 
         href = f'<a href="data:file/csv;base64,{b64}" download="scorecard.csv">Download CSV File</a>'
@@ -77,7 +77,7 @@ def app():
 
     # Save scorecard
     if st.button("점수카드 저장"):
-        scorecard.to_csv('scorecard.csv')
+        scorecard.astype(int).to_csv('scorecard.csv')
 
 if __name__ == "__main__":
     app()
