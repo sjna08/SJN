@@ -1,6 +1,7 @@
 def app():
     import streamlit as st
     import pandas as pd
+    import numpy as np
     import base64
     import io
 
@@ -30,17 +31,19 @@ def app():
 
     # Create or load scorecard
     if 'scorecard' not in st.session_state:
-        st.session_state['scorecard'] = pd.DataFrame(index=players, columns=holes)
+        st.session_state['scorecard'] = pd.DataFrame(np.nan, index=players, columns=holes)
     elif st.button("저장된 점수카드 불러오기"):
         st.session_state['scorecard'] = pd.read_csv('scorecard.csv', index_col=0)
+
     scorecard = st.session_state['scorecard']
 
-    for hole in selected_holes:
-        st.subheader(hole)
-        for player in players:
-            score = st.number_input(f'{player} {hole} 점수', min_value=0, value=scorecard.loc[player, hole], key=f'{player}_{hole}', format="%d")
+    for player in players:
+        for hole in selected_holes:
+            default_value = scorecard.loc[player, hole] if not np.isnan(scorecard.loc[player, hole]) else 0
+            score = st.number_input(f'{player} {hole} 점수', min_value=0, value=int(default_value), key=f'{player}_{hole}', format="%d")
             scorecard.loc[player, hole] = int(score)
 
+    # 계산 기능 추가
     if st.button('제출'):
         summary = pd.DataFrame(index=players, columns=['TTL','A','B', 'A_Dif','B_Dif','C','D', 'C_Dif','D_Dif','TTL_Dif'])
         summary['A'] = scorecard.iloc[:, :9].astype(int).sum(axis=1)
@@ -66,9 +69,10 @@ def app():
         b64 = base64.b64encode(csv_string.encode()).decode() 
         href = f'<a href="data:file/csv;base64,{b64}" download="scorecard.csv">Download CSV File</a>'
         st.markdown(href, unsafe_allow_html=True)
-        
-        if st.button("점수카드 저장"):
-            scorecard.to_csv('scorecard.csv')
+
+    # Save scorecard
+    if st.button("점수카드 저장"):
+        scorecard.to_csv('scorecard.csv')
 
 if __name__ == "__main__":
-   app()
+    app()
