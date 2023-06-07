@@ -36,23 +36,14 @@ def app():
     for hole in selected_holes:
         st.subheader(hole)
         for player in players:
-            scorecard.loc[player, hole] = st.number_input(f'{player} {hole} 점수', min_value=0, value=0, key=f'{player}_{hole}')
-    
-    # 데이터를 저장하거나 로드하는 기능
-    if st.button('저장'):
-        st.session_state['scorecard'].to_csv('scorecard.csv', encoding='utf-8-sig')
-        st.success("저장되었습니다.")
-    if st.button('로드'):
-        if os.path.exists('scorecard.csv'):
-            st.session_state['scorecard'] = pd.read_csv('scorecard.csv', index_col=0)
-            st.success("불러오기 성공.")
+            scorecard.loc[player, hole] = st.number_input(f'{player} {hole} 점수', min_value=0, value=0, key=f'{player}_{hole}', format="%d")
 
     if st.button('제출'):
         summary = pd.DataFrame(index=players, columns=['TTL','A','B', 'A_Dif','B_Dif','C','D', 'C_Dif','D_Dif','TTL_Dif'])
-        summary['A'] = scorecard.iloc[:, :9].sum(axis=1)
-        summary['B'] = scorecard.iloc[:, 9:18].sum(axis=1)
-        summary['C'] = scorecard.iloc[:, 18:27].sum(axis=1)
-        summary['D'] = scorecard.iloc[:, 27:].sum(axis=1)
+        summary['A'] = scorecard.iloc[:, :9].sum(axis=1).astype(int)
+        summary['B'] = scorecard.iloc[:, 9:18].sum(axis=1).astype(int)
+        summary['C'] = scorecard.iloc[:, 18:27].sum(axis=1).astype(int)
+        summary['D'] = scorecard.iloc[:, 27:].sum(axis=1).astype(int)
         summary['TTL'] = summary['A'] + summary['B'] + summary['C'] + summary['D']
 
         summary['A_Dif'] = summary['A'] - 33
