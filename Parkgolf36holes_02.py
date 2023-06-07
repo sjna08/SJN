@@ -40,7 +40,7 @@ def app():
 
     # Display scorecard for input
     scorecard = st.session_state['scorecard']
-   for hole in selected_holes:
+    for hole in selected_holes:
        hole_name = f'<h3><strong>{hole}</strong></h3>'
        st.markdown(hole_name, unsafe_allow_html=True)
         
