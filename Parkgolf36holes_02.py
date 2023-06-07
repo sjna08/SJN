@@ -1,4 +1,3 @@
-# 필요한 라이브러리 불러오기
 import streamlit as st
 import pandas as pd
 import base64
@@ -49,24 +48,4 @@ if st.button('제출'):
     summary['B'] = scorecard.iloc[:, 9:18].sum(axis=1)
     summary['C'] = scorecard.iloc[:, 18:27].sum(axis=1)
     summary['D'] = scorecard.iloc[:, 27:].sum(axis=1)
-    summary['TTL'] = summary['A'] + summary['B'] + summary['C'] + summary['D']
-    
-    # 차이를 계산
-    summary['A_Dif'] = summary['A'] - 33
-    summary['B_Dif'] = summary['B'] - 33
-    summary['C_Dif'] = summary['C'] - 33
-    summary['D_Dif'] = summary['D'] - 33
-    summary['TTL_Dif'] = summary['TTL'] - 132
-
-    st.write(summary)
-    st.write(scorecard)
-
-    # 스코어카드와 요약을 합치기
-    full_scorecard = pd.concat([summary, scorecard], axis=1)
-
-    csv_buffer = io.StringIO()
-    full_scorecard.to_csv(csv_buffer, index=True, encoding='utf-8-sig')
-    csv_string = csv_buffer.getvalue()
-    b64 = base64.b64encode(csv_string.encode()).decode() 
-    href = f'<a href="data:file/csv;base64,{b64}" download="scorecard.csv">Download CSV File</a>'
-    st.markdown(href, unsafe_allow_html=True)
+    summary['TTL'] = summary['A
