@@ -18,7 +18,7 @@ def app():
             'D5_Par4(58m)', 'D6_Par3(55m)', 'D7_Par4(71m)', 'D8_Par5(123m)', 'D9_Par3(66m)']
 
     num_players = 4
-    players = [st.sidebar.text_input(f'Player {i+1}이름',value=f'Player{i+1}') for i in range(num_players)]
+    players = [st.sidebar.text_input(f'Player {i+1} 이름', value=f'Player{i+1}') for i in range(num_players)]
 
     page = st.sidebar.radio('페이지 선택', ['A&B 홀', 'C&D 홀', '전체'])
 
@@ -40,9 +40,12 @@ def app():
     for player in players:
         if player not in scorecard.index:
             scorecard.loc[player, :] = np.nan
-        for hole in selected_holes:
+
+    for hole in selected_holes:
+        st.markdown(f"### {hole}")
+        for player in players:
             default_value = scorecard.loc[player, hole] if not np.isnan(scorecard.loc[player, hole]) else 0
-            score = st.number_input(f'{player} {hole} 점수', min_value=0, value=int(default_value), key=f'{player}_{hole}', format="%d")
+            score = st.number_input(f'{player} 점수', min_value=0, value=int(default_value), key=f'{player}_{hole}', format="%d")
             scorecard.loc[player, hole] = int(score)
 
     # 계산 기능 추가
