@@ -38,6 +38,8 @@ def app():
     scorecard = st.session_state['scorecard']
 
     for player in players:
+        if player not in scorecard.index:
+            scorecard.loc[player, :] = np.nan
         for hole in selected_holes:
             default_value = scorecard.loc[player, hole] if not np.isnan(scorecard.loc[player, hole]) else 0
             score = st.number_input(f'{player} {hole} 점수', min_value=0, value=int(default_value), key=f'{player}_{hole}', format="%d")
