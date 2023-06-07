@@ -34,27 +34,28 @@ def app():
         st.session_state['scorecard'] = pd.DataFrame(np.nan, index=players, columns=holes)
     elif st.button("저장된 점수카드 불러오기"):
         st.session_state['scorecard'] = pd.read_csv('scorecard.csv', index_col=0)
+        
+    # Update player names
+    st.session_state['scorecard'].index = players
 
+    # Display scorecard for input
     scorecard = st.session_state['scorecard']
-
-    for player in players:
-        if player not in scorecard.index:
-            scorecard.loc[player, :] = np.nan
-
     for hole in selected_holes:
-        st.markdown(f"### {hole}")
         for player in players:
             default_value = scorecard.loc[player, hole] if not np.isnan(scorecard.loc[player, hole]) else 0
-            score = st.number_input(f'{player} 점수', min_value=0, value=int(default_value), key=f'{player}_{hole}', format="%d")
-            scorecard.loc[player, hole] = int(score)
+            score = st.number_input(f'{player} {hole} 점수', min_value=0, value=int(default_value), key=f'{player}_{hole}', format="%d")
+            scorecard.loc[player, hole] = score
 
-    # 계산 기능 추가
+    # Update scorecard in session state
+    st.session_state['scorecard'] = scorecard
+
+    # Submit scores and calculate summary
     if st.button('제출'):
         summary = pd.DataFrame(index=players, columns=['TTL','A','B', 'A_Dif','B_Dif','C','D', 'C_Dif','D_Dif','TTL_Dif'])
-        summary['A'] = scorecard.iloc[:, :9].astype(int).sum(axis=1)
-        summary['B'] = scorecard.iloc[:, 9:18].astype(int).sum(axis=1)
-        summary['C'] = scorecard.iloc[:, 18:27].astype(int).sum(axis=1)
-        summary['D'] = scorecard.iloc[:, 27:].astype(int).sum(axis=1)
+        summary['A'] = scorecard.iloc[:, :9].sum(axis=1)
+        summary['B'] = scorecard.iloc[:, 9:18].sum(axis=1)
+        summary['C'] = scorecard.iloc[:, 18:27].sum(axis=1)
+        summary['D'] = scorecard.iloc[:, 27:].sum(axis=1)
         summary['TTL'] = summary['A'] + summary['B'] + summary['C'] + summary['D']
 
         summary['A_Dif'] = summary['A'] - 33
@@ -63,13 +64,13 @@ def app():
         summary['D_Dif'] = summary['D'] - 33
         summary['TTL_Dif'] = summary['TTL'] - 132
 
-        st.write(summary.astype(int))
-        st.write(scorecard.astype(int))
+        st.write(summary.fillna(0).astype(int))
+        st.write(scorecard.fillna(0).astype(int))
 
         full_scorecard = pd.concat([summary, scorecard], axis=1)
 
         csv_buffer = io.StringIO()
-        full_scorecard.astype(int).to_csv(csv_buffer, index=True, encoding='utf-8-sig')
+        full_scorecard.fillna(0).astype(int).to_csv(csv_buffer, index=True, encoding='utf-8-sig')
         csv_string = csv_buffer.getvalue()
         b64 = base64.b64encode(csv_string.encode()).decode() 
         href = f'<a href="data:file/csv;base64,{b64}" download="scorecard.csv">Download CSV File</a>'
@@ -77,7 +78,7 @@ def app():
 
     # Save scorecard
     if st.button("점수카드 저장"):
-        scorecard.astype(int).to_csv('scorecard.csv')
+        scorecard.fillna(0).astype(int).to_csv('scorecard.csv')
 
 if __name__ == "__main__":
     app()
