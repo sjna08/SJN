@@ -62,3 +62,6 @@ def app():
         b64 = base64.b64encode(csv_string.encode()).decode() 
         href = f'<a href="data:file/csv;base64,{b64}" download="scorecard.csv">Download CSV File</a>'
         st.markdown(href, unsafe_allow_html=True)
+if __name__ == "__main__":
+   app()
+
