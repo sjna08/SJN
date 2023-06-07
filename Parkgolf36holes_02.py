@@ -44,7 +44,34 @@ def app():
         st.success("저장되었습니다.")
     if st.button('로드'):
         if os.path.exists('scorecard.csv'):
-            st.session_state['scorecard'] = pd.read
+            st.session_state['scorecard'] = pd.read_csv('scorecard.csv', index_col=0)
+            st.success("불러오기 성공.")
+
+    if st.button('제출'):
+        summary = pd.DataFrame(index=players, columns=['TTL','A','B', 'A_Dif','B_Dif','C','D', 'C_Dif','D_Dif','TTL_Dif'])
+        summary['A'] = scorecard.iloc[:, :9].sum(axis=1)
+        summary['B'] = scorecard.iloc[:, 9:18].sum(axis=1)
+        summary['C'] = scorecard.iloc[:, 18:27].sum(axis=1)
+        summary['D'] = scorecard.iloc[:, 27:].sum(axis=1)
+        summary['TTL'] = summary['A'] + summary['B'] + summary['C'] + summary['D']
+
+        summary['A_Dif'] = summary['A'] - 33
+        summary['B_Dif'] = summary['B'] - 33
+        summary['C_Dif'] = summary['C'] - 33
+        summary['D_Dif'] = summary['D'] - 33
+        summary['TTL_Dif'] = summary['TTL'] - 132
+
+        st.write(summary)
+        st.write(scorecard)
+
+        full_scorecard = pd.concat([summary, scorecard], axis=1)
+
+        csv_buffer = io.StringIO()
+        full_scorecard.to_csv(csv_buffer, index=True, encoding='utf-8-sig')
+        csv_string = csv_buffer.getvalue()
+        b64 = base64.b64encode(csv_string.encode()).decode() 
+        href = f'<a href="data:file/csv;base64,{b64}" download="scorecard.csv">Download CSV File</a>'
+        st.markdown(href, unsafe_allow_html=True)
 
 if __name__ == "__main__":
    app()
