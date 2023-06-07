@@ -48,4 +48,4 @@ if st.button('제출'):
     summary['B'] = scorecard.iloc[:, 9:18].sum(axis=1)
     summary['C'] = scorecard.iloc[:, 18:27].sum(axis=1)
     summary['D'] = scorecard.iloc[:, 27:].sum(axis=1)
-    summary['TTL'] = summary['A
+   summary['TTL'] = summary['A']
