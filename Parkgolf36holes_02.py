@@ -3,7 +3,7 @@ import streamlit as st
 import pandas as pd
 import base64
 import io
-def app():
+def app()
  
 # Main Page
 st.title("ParkGolf ScoreCard")
