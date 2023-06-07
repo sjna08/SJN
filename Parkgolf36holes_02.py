@@ -19,22 +19,16 @@ def app():
     num_players = 4
     players = [st.sidebar.text_input(f'Player {i+1} 이름', value=f'Player{i+1}') for i in range(num_players)]
 
+    # 스코어카드 초기화
     if 'scorecard' not in st.session_state:
-        st.session_state['scorecard'] = pd.DataFrame(index=players, columns=holes)
-    
-    page = st.sidebar.radio('페이지 선택', ['A&B 홀', 'C&D 홀', '전체'])
+        st.session_state['scorecard'] = pd.DataFrame(0, index=range(num_players), columns=holes)
 
-    if page == 'A&B 홀':
-        selected_holes = holes[:18]
-    elif page == 'C&D 홀':
-        selected_holes = holes[18:]
-    else:
-        selected_holes = holes
-
-    for hole in selected_holes:
-        st.subheader(hole)
-        for player in players:
-            st.session_state['scorecard'].loc[player, hole] = st.number_input(f'{player} {hole} 점수', min_value=0, value=0, step=1, key=f'{player}_{hole}')
+    # 각 플레이어의 각 홀 점수 입력
+    for player in players:
+        with st.form(key=f'{player}_form'):
+            for hole in holes:
+                st.session_state['scorecard'].loc[players.index(player), hole] = st.number_input(f'{player} - {hole}', min_value=0, max_value=10, value=0, step=1, key=f'{player}_{hole}')
+            st.form_submit_button('저장')
 
     if st.button('제출'):
         st.session_state['scorecard'].index = players  # update player names
@@ -62,7 +56,7 @@ def app():
         b64 = base64.b64encode(csv_string.encode()).decode() 
         href = f'<a href="data:file/csv;base64,{b64}" download="scorecard.csv">Download CSV File</a>'
         st.markdown(href, unsafe_allow_html=True)
-        
+
 if __name__ == "__main__":
    app()
 
