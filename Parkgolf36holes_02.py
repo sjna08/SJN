@@ -29,8 +29,13 @@ def app():
     else:
         selected_holes = holes
 
-    if 'scorecard' not in st.session_state:
+    # 점수카드가 없거나, 새로운 점수카드를 생성하는 버튼이 눌렸다면 새로운 점수카드를 생성합니다.
+    if 'scorecard' not in st.session_state or st.button("새로운 점수카드 생성"):
         st.session_state['scorecard'] = pd.DataFrame(index=players, columns=holes)
+    
+    # 저장된 점수카드를 불러오는 버튼이 눌렸다면, 저장된 점수카드를 불러옵니다.
+    if st.button("저장된 점수카드 불러오기"):
+        st.session_state['scorecard'] = pd.read_csv('scorecard.csv', index_col=0)
     scorecard = st.session_state['scorecard']
 
     for hole in selected_holes:
@@ -40,10 +45,10 @@ def app():
 
     if st.button('제출'):
         summary = pd.DataFrame(index=players, columns=['TTL','A','B', 'A_Dif','B_Dif','C','D', 'C_Dif','D_Dif','TTL_Dif'])
-        summary['A'] = scorecard.iloc[:, :9].sum(axis=1).astype(int)
-        summary['B'] = scorecard.iloc[:, 9:18].sum(axis=1).astype(int)
-        summary['C'] = scorecard.iloc[:, 18:27].sum(axis=1).astype(int)
-        summary['D'] = scorecard.iloc[:, 27:].sum(axis=1).astype(int)
+        summary['A'] = scorecard.iloc[:, :9].sum(axis=1)
+        summary['B'] = scorecard.iloc[:, 9:18].sum(axis=1)
+        summary['C'] = scorecard.iloc[:, 18:27].sum(axis=1)
+        summary['D'] = scorecard.iloc[:, 27:].sum(axis=1)
         summary['TTL'] = summary['A'] + summary['B'] + summary['C'] + summary['D']
 
         summary['A_Dif'] = summary['A'] - 33
@@ -63,6 +68,9 @@ def app():
         b64 = base64.b64encode(csv_string.encode()).decode() 
         href = f'<a href="data:file/csv;base64,{b64}" download="scorecard.csv">Download CSV File</a>'
         st.markdown(href, unsafe_allow_html=True)
+
+        # Save the scorecard
+        full_scorecard.to_csv('scorecard.csv')
 
 if __name__ == "__main__":
    app()
