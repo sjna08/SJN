@@ -11,7 +11,7 @@ def app():
     # 플레이어 수 설정
     num_players = 4
     players = [st.sidebar.text_input(f'Player {i+1} 이름', value=f'Player{i+1}') for i in range(num_players)]
-  
+
     # 홀 이름과 거리 설정
     holes = ['A1_Par4(60m)', 'A2_Par3(40m)', 'A3_Par3(65m)', 'A4_Par4(100m)', 
              'A5_Par5(130m)', 'A6_Par4(72m)', 'A7_Par4(81m)', 'A8_Par3(50m)', 'A9_Par3(50m)', 
@@ -23,14 +23,17 @@ def app():
              'D5_Par4(58m)', 'D6_Par3(55m)', 'D7_Par4(71m)', 'D8_Par5(123m)', 'D9_Par3(66m)']
 
     # 스코어카드 생성
-    scorecard = pd.DataFrame(index=players, columns=holes)
+    if 'scorecard' not in st.session_state:
+        st.session_state['scorecard'] = pd.DataFrame(index=players, columns=holes)
+
+    scorecard = st.session_state['scorecard']
 
     # 사용자에게 입력 받기
     for hole in holes:
         st.subheader(hole)
         for player in players:
-            default_value = scorecard.loc[player, hole]
-            score = st.number_input(f'{player} {hole} 점수', min_value=0, value=default_value if not pd.isna(default_value) else 0, key=f'{player}_{hole}', format="%d")
+            default_value = scorecard.loc[player, hole] if not pd.isna(scorecard.loc[player, hole]) else 0
+            score = st.number_input(f'{player} {hole} 점수', min_value=0, value=int(default_value), key=f'{player}_{hole}', format="%d")
             scorecard.loc[player, hole] = score
 
     # 입력 받은 정보를 표시하고 다운로드 받기
@@ -41,7 +44,7 @@ def app():
         summary['C'] = scorecard.iloc[:, 18:27].sum(axis=1)
         summary['D'] = scorecard.iloc[:, 27:].sum(axis=1)
         summary['TTL'] = summary['A'] + summary['B'] + summary['C'] + summary['D']
-        
+
         # 차이를 계산
         summary['A_Dif'] = summary['A'] - 33
         summary['B_Dif'] = summary['B'] - 33
@@ -57,7 +60,7 @@ def app():
         csv_buffer = io.StringIO()
         full_scorecard.to_csv(csv_buffer, index=True, encoding='utf-8-sig')
         csv_string = csv_buffer.getvalue()
-        b64 = base64.b64encode(csv_string.encode()).decode() 
+        b64 = base64.b64encode(csv_string.encode()).decode()
         href = f'<a href="data:file/csv;base64,{b64}" download="scorecard.csv">점수카드 열기</a>'
         st.markdown(href, unsafe_allow_html=True)
 
@@ -67,3 +70,4 @@ def app():
 
 if __name__ == "__main__":
     app()
+
