@@ -45,13 +45,6 @@ def app():
         summary['D'] = scorecard.iloc[:, 27:].sum(axis=1)
         summary['TTL'] = summary['A'] + summary['B'] + summary['C'] + summary['D']
 
-        # 차이를 계산
-        summary['A_Dif'] = summary['A'] - 33
-        summary['B_Dif'] = summary['B'] - 33
-        summary['C_Dif'] = summary['C'] - 33
-        summary['D_Dif'] = summary['D'] - 33
-        summary['TTL_Dif'] = summary['TTL'] - 132
-
         st.write(summary.fillna(0).astype(int))
         st.write(scorecard.fillna(0).astype(int))
 
@@ -61,7 +54,7 @@ def app():
         full_scorecard.to_csv(csv_buffer, index=True, encoding='utf-8-sig')
         csv_string = csv_buffer.getvalue()
         b64 = base64.b64encode(csv_string.encode()).decode()
-        href = f'<a href="data:file/csv;base64,{b64}" download="scorecard.csv">점수카드 열기</a>'
+        href = f'<a href="data:file/csv;base64,{b64}" download="scorecard.csv">Download CSV File</a>'
         st.markdown(href, unsafe_allow_html=True)
 
         if st.button("점수카드 저장"):
@@ -70,4 +63,3 @@ def app():
 
 if __name__ == "__main__":
     app()
-
