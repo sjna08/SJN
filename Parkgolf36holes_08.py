@@ -22,6 +22,9 @@ def app():
              'D1_Par3(69m)', 'D2_Par4(100m)', 'D3_Par4(68m)', 'D4_Par3(50m)', 
              'D5_Par4(58m)', 'D6_Par3(55m)', 'D7_Par4(71m)', 'D8_Par5(123m)', 'D9_Par3(66m)']
 
+    # 홀 선택
+    selected_hole = st.sidebar.selectbox("홀 선택", holes)
+
     # 스코어카드 생성
     if 'scorecard' not in st.session_state:
         st.session_state['scorecard'] = pd.DataFrame(index=players, columns=holes)
@@ -29,21 +32,26 @@ def app():
     scorecard = st.session_state['scorecard']
 
     # 사용자에게 입력 받기
-    for hole in holes:
-        st.subheader(hole)
-        for player in players:
-            default_value = scorecard.loc[player, hole] if not pd.isna(scorecard.loc[player, hole]) else 0
-            score = st.number_input(f'{player} {hole} 점수', min_value=0, value=int(default_value), key=f'{player}_{hole}', format="%d")
-            scorecard.loc[player, hole] = score
+    for player in players:
+        default_value = scorecard.loc[player, selected_hole] if not pd.isna(scorecard.loc[player, selected_hole]) else 0
+        score = st.number_input(f'{player} {selected_hole} 점수', min_value=0, value=int(default_value), key=f'{player}_{selected_hole}', format="%d")
+        scorecard.loc[player, selected_hole] = score
 
     # 입력 받은 정보를 표시하고 다운로드 받기
     if st.button('제출'):
-        summary = pd.DataFrame(index=players, columns=['TTL', 'A', 'B', 'C', 'D'])
+        summary = pd.DataFrame(index=players, columns=['TTL','A','B', 'A_Dif','B_Dif','C','D', 'C_Dif','D_Dif','TTL_Dif'])
         summary['A'] = scorecard.iloc[:, :9].sum(axis=1)
         summary['B'] = scorecard.iloc[:, 9:18].sum(axis=1)
         summary['C'] = scorecard.iloc[:, 18:27].sum(axis=1)
         summary['D'] = scorecard.iloc[:, 27:].sum(axis=1)
         summary['TTL'] = summary['A'] + summary['B'] + summary['C'] + summary['D']
+
+        # 차이를 계산
+        summary['A_Dif'] = summary['A'] - 33
+        summary['B_Dif'] = summary['B'] - 33
+        summary['C_Dif'] = summary['C'] - 33
+        summary['D_Dif'] = summary['D'] - 33
+        summary['TTL_Dif'] = summary['TTL'] - 132
 
         st.write(summary.fillna(0).astype(int))
         st.write(scorecard.fillna(0).astype(int))
@@ -63,3 +71,4 @@ def app():
 
 if __name__ == "__main__":
     app()
+
