@@ -23,7 +23,7 @@ def app():
              'D5_Par4(58m)', 'D6_Par3(55m)', 'D7_Par4(71m)', 'D8_Par5(123m)', 'D9_Par3(66m)']
 
     # 홀 선택
-    selected_hole = st.sidebar.selectbox("홀 선택", holes)
+    selected_hole = st.sidebar.radio("홀 선택", ['A홀', 'B홀', 'C홀', 'D홀', '전체'])
 
     # 스코어카드 생성
     if 'scorecard' not in st.session_state:
@@ -31,15 +31,28 @@ def app():
 
     scorecard = st.session_state['scorecard']
 
+    if selected_hole == '전체':
+        selected_holes = holes
+    elif selected_hole == 'A홀':
+        selected_holes = holes[:9]
+    elif selected_hole == 'B홀':
+        selected_holes = holes[9:18]
+    elif selected_hole == 'C홀':
+        selected_holes = holes[18:27]
+    elif selected_hole == 'D홀':
+        selected_holes = holes[27:]
+
     # 사용자에게 입력 받기
-    for player in players:
-        default_value = scorecard.loc[player, selected_hole] if not pd.isna(scorecard.loc[player, selected_hole]) else 0
-        score = st.number_input(f'{player} {selected_hole} 점수', min_value=0, value=int(default_value), key=f'{player}_{selected_hole}', format="%d")
-        scorecard.loc[player, selected_hole] = score
+    for hole in selected_holes:
+        st.subheader(hole)
+        for player in players:
+            default_value = scorecard.loc[player, hole] if not pd.isna(scorecard.loc[player, hole]) else 0
+            score = st.number_input(f'{player} {hole} 점수', min_value=0, value=int(default_value), key=f'{player}_{hole}', format="%d")
+            scorecard.loc[player, hole] = score
 
     # 입력 받은 정보를 표시하고 다운로드 받기
     if st.button('제출'):
-        summary = pd.DataFrame(index=players, columns=['TTL','A','B', 'A_Dif','B_Dif','C','D', 'C_Dif','D_Dif','TTL_Dif'])
+        summary = pd.DataFrame(index=players, columns=['TTL', 'A', 'B', 'C', 'D', 'A_Dif', 'B_Dif', 'C_Dif', 'D_Dif', 'TTL_Dif'])
         summary['A'] = scorecard.iloc[:, :9].sum(axis=1)
         summary['B'] = scorecard.iloc[:, 9:18].sum(axis=1)
         summary['C'] = scorecard.iloc[:, 18:27].sum(axis=1)
