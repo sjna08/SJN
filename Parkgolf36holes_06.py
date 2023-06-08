@@ -1,8 +1,8 @@
 import streamlit as st
 import pandas as pd
+import numpy as np
 import base64
 import io
-import os
 
 def app():
     st.title("ParkGolf ScoreCard")
@@ -41,8 +41,10 @@ def app():
     # Display scorecard for input
     scorecard = st.session_state['scorecard']
     for hole in selected_holes:
-        st.subheader(hole)
-        for player in players:
+       hole_name = f'<h3><strong>{hole}</strong></h3>'
+       st.markdown(hole_name, unsafe_allow_html=True)
+        
+       for player in players:
             default_value = scorecard.loc[player, hole] if not pd.isna(scorecard.loc[player, hole]) else 0
             score = st.number_input(f'{player} {hole} 점수', min_value=0, value=int(default_value), key=f'{player}_{hole}', format="%d")
             scorecard.loc[player, hole] = score
@@ -65,8 +67,8 @@ def app():
         summary['D_Dif'] = summary['D'] - 33
         summary['TTL_Dif'] = summary['TTL'] - 132
 
-        st.dataframe(summary.fillna(0).astype(int))
-        st.dataframe(scorecard.fillna(0).astype(int))
+        st.write(summary.fillna(0).astype(int))
+        st.write(scorecard.fillna(0).astype(int))
 
         full_scorecard = pd.concat([summary, scorecard], axis=1)
 
@@ -74,14 +76,12 @@ def app():
         full_scorecard.fillna(0).astype(int).to_csv(csv_buffer, index=True, encoding='utf-8-sig')
         csv_string = csv_buffer.getvalue()
         b64 = base64.b64encode(csv_string.encode()).decode() 
-        href = f'<a href="data:file/csv;base64,{b64}" download="scorecard.csv">Download CSV File</a>'
+        href = f'<a href="data:file/csv;base64,{b64}" download="scorecard.csv">점수카드 열기</a>'
         st.markdown(href, unsafe_allow_html=True)
 
-    # Save scorecard
-    if st.button("점수카드 저장"):
-        scorecard.fillna(0).astype(int).to_csv('scorecard.csv')
-        if st.button("점수카드 열기"):
-            os.startfile('scorecard.csv')
+        if st.button("점수카드 저장"):
+            with open('scorecard.csv', 'w') as f:
+                f.write(csv_string)
 
 if __name__ == "__main__":
     app()
