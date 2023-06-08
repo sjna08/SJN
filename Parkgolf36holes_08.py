@@ -30,17 +30,23 @@ def app():
 
     scorecard = pd.DataFrame(index=players, columns=selected_holes)
 
+    if page.startswith('A'):
+        if 'scorecard' not in st.session_state:
+            st.session_state['scorecard'] = scorecard
+
     for hole in selected_holes:
         st.subheader(hole)
         for player in players:
-            scorecard.loc[player, hole] = st.number_input(f'{player} {hole} 점수', min_value=0, value=0, key=f'{player}_{hole}')
+            default_value = 0 if not pd.isna(st.session_state['scorecard'].loc[player, hole]) else st.session_state['scorecard'].loc[player, hole]
+            score = st.number_input(f'{player} {hole} 점수', min_value=0, value=int(default_value), key=f'{player}_{hole}', format="%d")
+            st.session_state['scorecard'].loc[player, hole] = score
 
     if st.button('제출'):
         summary = pd.DataFrame(index=players, columns=['TTL', 'A', 'B', 'A_Dif', 'B_Dif', 'C', 'D', 'C_Dif', 'D_Dif', 'TTL_Dif'])
-        summary['A'] = scorecard.iloc[:, :9].sum(axis=1)
-        summary['B'] = scorecard.iloc[:, 9:18].sum(axis=1)
-        summary['C'] = scorecard.iloc[:, 18:27].sum(axis=1)
-        summary['D'] = scorecard.iloc[:, 27:].sum(axis=1)
+        summary['A'] = st.session_state['scorecard'].iloc[:, :9].sum(axis=1)
+        summary['B'] = st.session_state['scorecard'].iloc[:, 9:18].sum(axis=1)
+        summary['C'] = st.session_state['scorecard'].iloc[:, 18:27].sum(axis=1)
+        summary['D'] = st.session_state['scorecard'].iloc[:, 27:].sum(axis=1)
         summary['TTL'] = summary['A'] + summary['B'] + summary['C'] + summary['D']
         summary['A_Dif'] = summary['A'] - 33
         summary['B_Dif'] = summary['B'] - 33
@@ -49,12 +55,12 @@ def app():
         summary['TTL_Dif'] = summary['TTL'] - 132
 
         st.write(summary)
-        st.write(scorecard)
+        st.write(st.session_state['scorecard'])
 
-        full_scorecard = pd.concat([summary, scorecard], axis=1)
+        full_scorecard = pd.concat([summary, st.session_state['scorecard']], axis=1)
 
         csv_buffer = io.StringIO()
-        full_scorecard.to_csv(csv_buffer, index=True, encoding='utf-8-sig')
+        full_scorecard.astype(int).to_csv(csv_buffer, index=True, encoding='utf-8-sig')
         csv_string = csv_buffer.getvalue()
         b64 = base64.b64encode(csv_string.encode()).decode() 
         href = f'<a href="data:file/csv;base64,{b64}" download="scorecard.csv">Download CSV File</a>'
@@ -66,3 +72,4 @@ def app():
 
 if __name__ == "__main__":
     app()
+
