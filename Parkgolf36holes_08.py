@@ -46,7 +46,7 @@ def app():
     for hole in selected_holes:
         st.subheader(hole)
         for player in players:
-            default_value = scorecard.loc[player, hole] if not pd.isna(scorecard.loc[player, hole]) else 0
+            default_value = scorecard.loc[player, hole] if (player in scorecard.index) and (hole in scorecard.columns) and not pd.isna(scorecard.loc[player, hole]) else 0
             score = st.number_input(f'{player} {hole} 점수', min_value=0, value=int(default_value), key=f'{player}_{hole}', format="%d")
             scorecard.loc[player, hole] = score
 
@@ -84,4 +84,3 @@ def app():
 
 if __name__ == "__main__":
     app()
-
