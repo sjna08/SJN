@@ -28,12 +28,17 @@ def app():
     else:
         selected_holes = holes[page]
 
-    scorecard = pd.DataFrame(index=players, columns=selected_holes)
+    if 'scorecard' not in st.session_state:
+        st.session_state['scorecard'] = pd.DataFrame(index=players, columns=selected_holes)
+
+    scorecard = st.session_state['scorecard']
 
     for hole in selected_holes:
         st.subheader(hole)
         for player in players:
-            scorecard.loc[player, hole] = st.number_input(f'{player} {hole} 점수', min_value=0, value=0, key=f'{player}_{hole}')
+            default_value = scorecard.loc[player, hole] if not pd.isna(scorecard.loc[player, hole]) else 0
+            score = st.number_input(f'{player} {hole} 점수', min_value=0, value=int(default_value), key=f'{player}_{hole}')
+            scorecard.loc[player, hole] = score
 
     if st.button('제출'):
         summary = pd.DataFrame(index=players, columns=['TTL', 'A', 'B', 'A_Dif', 'B_Dif', 'C', 'D', 'C_Dif', 'D_Dif', 'TTL_Dif'])
@@ -66,3 +71,4 @@ def app():
 
 if __name__ == "__main__":
     app()
+
