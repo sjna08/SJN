@@ -10,8 +10,8 @@ df = pd.DataFrame(data)
 # 데이터를 CSV 파일로 저장
 df.to_csv('data.csv', index=False)
 
-# 사용자에게 데이터를 불러올 것인지 묻기
-response = input("CSV 파일을 불러올까요? (yes/no): ")
+# 불러오기 선택
+response = "yes"
 
 if response.lower() == 'yes':
     # 데이터 불러오기
