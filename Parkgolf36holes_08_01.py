@@ -45,8 +45,7 @@ def app():
     # 사용자에게 입력 받기
    
     for hole in selected_holes:
-       hole_name = f'<h3><strong>{hole}</strong></h3>'
-       st.markdown(hole_name, unsafe_allow_html=True)
+       
        st.subheader(hole)
         
        for player in players:
