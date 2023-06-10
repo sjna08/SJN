@@ -54,20 +54,19 @@ def app():
             scorecard.loc[player, hole] = score
 
     # 입력 받은 정보를 표시하고 다운로드 받기
-    if st.button('제출'):
-        summary = pd.DataFrame(index=players, columns=['TTL', 'A', 'B', 'C', 'D', 'A_Dif', 'B_Dif', 'C_Dif', 'D_Dif', 'TTL_Dif'])
+     if st.button('제출'):
+        summary = pd.DataFrame(index=players, columns=['TTL','A','B', 'A_Dif','B_Dif','C','D', 'C_Dif','D_Dif','TTL_Dif'])
         summary['A'] = scorecard.iloc[:, :9].sum(axis=1)
         summary['B'] = scorecard.iloc[:, 9:18].sum(axis=1)
         summary['C'] = scorecard.iloc[:, 18:27].sum(axis=1)
         summary['D'] = scorecard.iloc[:, 27:].sum(axis=1)
         summary['TTL'] = summary['A'] + summary['B'] + summary['C'] + summary['D']
 
-        # 차이를 계산
         summary['A_Dif'] = summary['A'] - 33
         summary['B_Dif'] = summary['B'] - 33
         summary['C_Dif'] = summary['C'] - 33
         summary['D_Dif'] = summary['D'] - 33
-        summary['TTL_Dif'] = summary['TTL'] - 132 
+        summary['TTL_Dif'] = summary['TTL'] - 132
 
         st.write(summary.fillna(0).astype(int))
         st.write(scorecard.fillna(0).astype(int))
