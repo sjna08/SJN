@@ -3,7 +3,6 @@ import pandas as pd
 import base64
 import io
 from openpyxl.writer.excel import save_virtual_workbook
-
 # Main Page
 st.title("ParkGolf ScoreCard")
 
@@ -66,6 +65,9 @@ def app():
         summary['C_Dif'] = summary['C'] - 33
         summary['D_Dif'] = summary['D'] - 33
         summary['TTL_Dif'] = summary['TTL'] - 132 
+
+        st.write(summary.fillna(0).astype(int))
+        st.write(scorecard.fillna(0).astype(int))
 
         full_scorecard = pd.concat([summary, scorecard], axis=1)
 
