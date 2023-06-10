@@ -72,7 +72,7 @@ def app():
         full_scorecard = pd.concat([summary, scorecard], axis=1)
 
         csv_buffer = io.StringIO()
-        full_scorecard.to_csv(csv_buffer, index=True, encoding='utf-8-sig')
+        full_scorecard.to_csv(csv_buffer, index=True, encoding='ANSI')
         csv_string = csv_buffer.getvalue()
         b64 = base64.b64encode(csv_string.encode()).decode()
         href = f'<a href="data:file/csv;base64,{b64}" download="scorecard.csv">Download CSV File</a>'
