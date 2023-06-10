@@ -92,7 +92,10 @@ def app():
         b64 = base64.b64encode(excel_data).decode()
 
         # 다운로드 링크를 만들고 Streamlit 앱에 표시합니다.
-        href = f'<a href="data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,{b64}" download="scorecard.xlsx">Download XLSX File</a>'
+        href = f'<a href="data:application/octet-stream;base64,{b64}" download="scorecard.xlsx">Download XLSX File</a>'
+        st.markdown(href, unsafe_allow_html=True)
+
+        #href = f'<a href="data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,{b64}" download="scorecard.xlsx">Download XLSX File</a>'
         st.markdown(href, unsafe_allow_html=True)
 
         if st.button("점수카드 저장"):
