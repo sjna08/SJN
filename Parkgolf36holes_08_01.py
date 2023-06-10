@@ -2,16 +2,16 @@ import streamlit as st
 import pandas as pd
 import base64
 import io
+from openpyxl.writer.excel import save_virtual_workbook
 
 # Main Page
 st.title("ParkGolf ScoreCard")
 
 # Streamlit 앱 시작
 def app():
-
     # 플레이어 수 설정
     num_players = 4
-    players = [st.sidebar.text_input(f'Player {i+1}이름', value=f'Player{i+1}') for i in range(num_players)]
+    players = [st.sidebar.text_input(f'Player {i+1} 이름', value=f'Player{i+1}') for i in range(num_players)]
 
     # 홀 이름과 거리 설정
     holes = ['A1_Par4(60m)', 'A2_Par3(40m)', 'A3_Par3(65m)', 'A4_Par4(100m)', 
@@ -23,13 +23,15 @@ def app():
              'D1_Par3(69m)', 'D2_Par4(100m)', 'D3_Par4(68m)', 'D4_Par3(50m)', 
              'D5_Par4(58m)', 'D6_Par3(55m)', 'D7_Par4(71m)', 'D8_Par5(123m)', 'D9_Par3(66m)']
 
-    # 스코어카드 생성
-    scorecard = pd.DataFrame(index=players, columns=holes)
-
     # 홀 선택
-    selected_hole = st.sidebar.selectbox("홀 선택", ['A홀', 'B홀', 'C홀', 'D홀', '전체'])
+    selected_hole = st.sidebar.radio("홀 선택", ['A홀', 'B홀', 'C홀', 'D홀', '전체'])
 
-    # 선택된 홀에 따라 점수 입력
+    # 스코어카드 생성
+    if 'scorecard' not in st.session_state:
+        st.session_state['scorecard'] = pd.DataFrame(index=players, columns=holes)
+
+    scorecard = st.session_state['scorecard']
+
     if selected_hole == '전체':
         selected_holes = holes
     elif selected_hole == 'A홀':
@@ -45,36 +47,48 @@ def app():
     for hole in selected_holes:
         st.subheader(hole)
         for player in players:
-            scorecard.loc[player, hole] = st.number_input(f'{player} {hole} 점수', min_value=0, value=0, key=f'{player}_{hole}')
+            default_value = scorecard.loc[player, hole] if (player in scorecard.index) and (hole in scorecard.columns) and not pd.isna(scorecard.loc[player, hole]) else 0
+            score = st.number_input(f'{player} {hole} 점수', min_value=0, value=int(default_value), key=f'{player}_{hole}', format="%d")
+            scorecard.loc[player, hole] = score
 
     # 입력 받은 정보를 표시하고 다운로드 받기
     if st.button('제출'):
-        summary = pd.DataFrame(index=players, columns=['TTL','A','B', 'A_Dif','B_Dif','C','D', 'C_Dif','D_Dif','TTL_Dif'])
+        summary = pd.DataFrame(index=players, columns=['TTL', 'A', 'B', 'C', 'D', 'A_Dif', 'B_Dif', 'C_Dif', 'D_Dif', 'TTL_Dif'])
         summary['A'] = scorecard.iloc[:, :9].sum(axis=1)
         summary['B'] = scorecard.iloc[:, 9:18].sum(axis=1)
         summary['C'] = scorecard.iloc[:, 18:27].sum(axis=1)
         summary['D'] = scorecard.iloc[:, 27:].sum(axis=1)
         summary['TTL'] = summary['A'] + summary['B'] + summary['C'] + summary['D']
-        
+
         # 차이를 계산
         summary['A_Dif'] = summary['A'] - 33
         summary['B_Dif'] = summary['B'] - 33
         summary['C_Dif'] = summary['C'] - 33
         summary['D_Dif'] = summary['D'] - 33
-        summary['TTL_Dif'] = summary['TTL'] - 132
+        summary['TTL_Dif'] = summary['TTL'] - 132 
 
-        st.write(summary)
-        st.write(scorecard)
-
-        # 스코어카드와 요약을 합치기
         full_scorecard = pd.concat([summary, scorecard], axis=1)
 
-        csv_buffer = io.StringIO()
-        full_scorecard.to_csv(csv_buffer, index=True, encoding='utf-8-sig')
-        csv_string = csv_buffer.getvalue()
-        b64 = base64.b64encode(csv_string.encode()).decode() 
-        href = f'<a href="data:file/csv;base64,{b64}" download="scorecard.csv">Download CSV File</a>'
+        # Excel 파일을 메모리에 저장하기 위한 버퍼를 생성합니다.
+        excel_buffer = io.BytesIO()
+        
+        # DataFrame을 Excel 파일로 저장합니다.
+        with pd.ExcelWriter(excel_buffer, engine='openpyxl') as writer:
+            full_scorecard.to_excel(writer, index=True)
+
+        # 버퍼에 저장된 데이터를 가져옵니다.
+        excel_data = excel_buffer.getvalue()
+
+        # Excel 데이터를 base64 형식으로 인코딩합니다.
+        b64 = base64.b64encode(excel_data).decode()
+
+        # 다운로드 링크를 만들고 Streamlit 앱에 표시합니다.
+        href = f'<a href="data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,{b64}" download="scorecard.xlsx">Download XLSX File</a>'
         st.markdown(href, unsafe_allow_html=True)
+
+        if st.button("점수카드 저장"):
+            with open('scorecard.xlsx', 'wb') as f:
+                f.write(excel_data)
 
 if __name__ == "__main__":
     app()
