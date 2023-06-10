@@ -72,16 +72,27 @@ def app():
 
         full_scorecard = pd.concat([summary, scorecard], axis=1)
 
-        csv_buffer = io.StringIO()
-        full_scorecard.fillna(0).astype(int).to_csv(csv_buffer, index=True, encoding='utf-8-sig')
-        csv_string = csv_buffer.getvalue()
-        b64 = base64.b64encode(csv_string.encode()).decode() 
-        href = f'<a href="data:file/csv;base64,{b64}" download="scorecard.csv">점수카드 열기</a>'
+         # Excel 파일을 메모리에 저장하기 위한 버퍼를 생성합니다.
+        excel_buffer = io.BytesIO()
+        
+        # DataFrame을 Excel 파일로 저장합니다.
+        with pd.ExcelWriter(excel_buffer, engine='openpyxl') as writer:
+            full_scorecard.to_excel(writer, index=True)
+
+        # 버퍼에 저장된 데이터를 가져옵니다.
+        excel_data = excel_buffer.getvalue()
+
+        # Excel 데이터를 base64 형식으로 인코딩합니다.
+        b64 = base64.b64encode(excel_data).decode()
+
+        # 다운로드 링크를 만들고 Streamlit 앱에 표시합니다.
+        href = f'<a href="data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,{b64}" download="scorecard.xlsx">Download XLSX File</a>'
         st.markdown(href, unsafe_allow_html=True)
 
         if st.button("점수카드 저장"):
-            with open('scorecard.csv', 'w') as f:
-                f.write(csv_string)
+            with open('scorecard.xlsx', 'wb') as f:
+                f.write(excel_data)
+
 
 if __name__ == "__main__":
     app()
