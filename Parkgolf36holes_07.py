@@ -29,11 +29,11 @@ def app():
     else:
         selected_holes = holes
 
-    # Create or load scorecard
+   # Create or load scorecard
     if 'scorecard' not in st.session_state:
         st.session_state['scorecard'] = pd.DataFrame(index=players, columns=holes)
     elif st.button("저장된 점수카드 불러오기"):
-        st.session_state['scorecard'] = pd.read_csv('scorecard.csv', index_col=0)
+        st.session_state['scorecard'] = pd.read_excel('scorecard.xlsx', index_col=0)
         
     # Update player names
     st.session_state['scorecard'].index = players
