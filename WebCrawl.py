@@ -22,7 +22,6 @@ driver.get(url)
 # aritivlePage는 신문기사의 본문입니다
 article_page = driver.find_element(By.CLASS_NAME, 'articlePage')
 article_page
-<selenium.webdriver.remote.webelement.WebElement (session="d0e6dbbcd5f3fa889cfa228f445c9576", element="0053d389-fa03-426c-b735-52c2dc17e736")>
 
 # 신문기사의 본문을 출력합니다.
 print(article_page.text)
