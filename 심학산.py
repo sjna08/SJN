@@ -5,7 +5,7 @@ import base64
 import io
 
 def app():
-    st.title("ParkGolf ScoreCard")
+    st.title("심학산 ScoreCard")
 
     # 홀 이름과 거리 설정
     holes = ['A1_Par4(62m)', 'A2_Par3(41m)', 'A3_Par4(67m)', 'A4_Par3(40m)', 
