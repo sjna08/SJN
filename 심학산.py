@@ -88,12 +88,11 @@ def app():
         # 버퍼에 저장된 데이터를 가져옵니다.
         excel_data = excel_buffer.getvalue()
 
-        # Excel 데이터를 base64 형식으로 인코딩합니다.
-        b64 = base64.b64encode(excel_data).decode()
-
-        # 다운로드 링크를 만들고 Streamlit 앱에 표시합니다.
-        href = f'<a href="data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,{b64}" download="scorecard.xlsx">Download XLSX File</a>'
-        st.markdown(href, unsafe_allow_html=True)
+        # st.download_button을 이용해 excel 파일을 다운로드 링크로 제공합니다.
+        st.download_button(label='점수카드 다운로드',
+                            data=excel_data,
+                            file_name='scorecard.xlsx',
+                            mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
         if st.button("점수카드 저장"):
             with open('scorecard.xlsx', 'wb') as f:
