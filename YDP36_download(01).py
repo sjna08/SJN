@@ -47,10 +47,10 @@ def app():
     # Display scorecard for input
     scorecard = st.session_state['scorecard']
     for hole in selected_holes:
-       hole_name = f'<h3><strong>{hole}</strong></h3>'
-       st.markdown(hole_name, unsafe_allow_html=True)
-        
-       for player in players:
+        hole_name = f'<h3><strong>{hole}</strong></h3>'
+        st.markdown(hole_name, unsafe_allow_html=True)
+
+        for player in players:
             score_key = f'{player}_{hole}'
             default_value = st.session_state.get(score_key, 0)  # Use get method to avoid key error
             score = st.number_input(f'{player} {hole} 점수', min_value=0, value=int(default_value), key=score_key, format="%d")
