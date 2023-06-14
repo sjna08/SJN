@@ -3,6 +3,21 @@ import pandas as pd
 import numpy as np
 import base64
 import io
+import os
+import json
+
+SCORES_FILE = 'scores.json'
+
+def load_scores():
+    if os.path.exists(SCORES_FILE):
+        with open(SCORES_FILE) as f:
+            return json.load(f)
+    else:
+        return {}
+
+def save_scores(scores):
+    with open(SCORES_FILE, 'w') as f:
+        json.dump(scores, f)
 
 def app():
     st.title("YDP ScoreCard")
@@ -32,38 +47,20 @@ def app():
    # 스코어카드 생성
     scorecard = pd.DataFrame(index=players, columns=holes)
 
-    # Create or load scorecard
-    if 'scorecard' not in st.session_state:
-        st.session_state['scorecard'] = pd.DataFrame(index=players, columns=holes)
-    elif st.button("저장된 점수카드 불러오기"):
-        try:
-            st.session_state['scorecard'] = pd.read_excel('scorecard.xlsx', index_col=0)
-        except FileNotFoundError:
-            st.warning("저장된 점수카드를 찾을 수 없습니다.")
-
-    # Update player names
-    st.session_state['scorecard'].index = players
-    # Initialize or get scorecard from session state
-    if 'scorecard' not in st.session_state:
-        st.session_state['scorecard'] = pd.DataFrame(index=players, columns=holes)
-
-    # Keep a reference to scorecard (do not get from session state again in this function)
-    scorecard = st.session_state['scorecard']
-
+    scores = load_scores()  # Load scores from file
+    
     # Display scorecard for input
     for hole in selected_holes:
         hole_name = f'<h3><strong>{hole}</strong></h3>'
         st.markdown(hole_name, unsafe_allow_html=True)
 
         for player in players:
-            default_value = scorecard.loc[player, hole] if not pd.isna(scorecard.loc[player, hole]) else 0
-            score = st.number_input(f'{player} {hole} 점수', min_value=0, value=int(default_value), key=f'{player}_{hole}', format="%d")
-            scorecard.loc[player, hole] = score  # Update score in the scorecard DataFrame directly
+            score_key = f'{player}_{hole}'
+            default_value = scores.get(score_key, 0)
+            score = st.number_input(f'{player} {hole} 점수', min_value=0, value=int(default_value), key=score_key, format="%d")
+            scores[score_key] = score  # Update score in scores dictionary
 
            
-    # Store the whole scorecard in session state
-    st.session_state['scorecard'] = scorecard
-
     # Submit scores and calculate summary
     if st.button('제출'):
         summary = pd.DataFrame(index=players, columns=['TTL','A','B', 'A_Dif','B_Dif','C','D', 'C_Dif','D_Dif','TTL_Dif'])
