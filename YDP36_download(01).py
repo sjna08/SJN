@@ -60,7 +60,7 @@ def app():
             score = st.number_input(f'{player} {hole} 점수', min_value=0, value=int(default_value), key=score_key, format="%d")
             scores[score_key] = score  # Update score in scores dictionary
 
-    save_scores(scores)  # Save scores to file
+    #save_scores(scores)  # Save scores to file
 
             
     # Submit scores and calculate summary
