@@ -55,14 +55,9 @@ def app():
             default_value = st.session_state.get(score_key, 0)  # Use get method to avoid key error
             score = st.number_input(f'{player} {hole} 점수', min_value=0, value=int(default_value), key=score_key, format="%d")
             st.session_state[score_key] = score  # Update score in session state
-
-    # Update scorecard with scores from session state
-    for player in players:
-        for hole in selected_holes:
-            score_key = f'{player}_{hole}'
-            if score_key in st.session_state:
-                scorecard.loc[player, hole] = st.session_state[score_key]
-
+            
+    # Store the whole scorecard in session state
+    st.session_state['scorecard'] = scorecard
 
     # Submit scores and calculate summary
     if st.button('제출'):
