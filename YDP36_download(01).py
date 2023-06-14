@@ -52,7 +52,7 @@ def app():
         
        for player in players:
             score_key = f'{player}_{hole}'
-            default_value = st.session_state[score_key] if score_key in st.session_state else 0
+            default_value = st.session_state.get(score_key, 0)  # Use get method to avoid key error
             score = st.number_input(f'{player} {hole} 점수', min_value=0, value=int(default_value), key=score_key, format="%d")
             st.session_state[score_key] = score  # Update score in session state
 
