@@ -43,7 +43,12 @@ def app():
 
     # Update player names
     st.session_state['scorecard'].index = players
+    # Initialize or get scorecard from session state
+    if 'scorecard' not in st.session_state:
+        st.session_state['scorecard'] = pd.DataFrame(index=players, columns=holes)
 
+    # Keep a reference to scorecard (do not get from session state again in this function)
+    scorecard = st.session_state['scorecard']
     # Display scorecard for input
     scorecard = st.session_state['scorecard']
     for hole in selected_holes:
