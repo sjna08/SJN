@@ -12,7 +12,7 @@ def app():
     current_date = datetime.date.today()
 
     # Streamlit 앱에 현재 날짜 출력
-    st.subheader(f"현재 날짜: {current_date}")
+    st.subheader(f"날짜: {current_date}")
 
     # 홀 이름과 거리 설정
     holes = ['A1_Par4(60m)', 'A2_Par3(40m)', 'A3_Par3(65m)', 'A4_Par4(100m)', 
