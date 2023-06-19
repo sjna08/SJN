@@ -3,9 +3,16 @@ import pandas as pd
 import numpy as np
 import base64
 import io
+import datetime
 
 def app():
     st.title("심학산 ScoreCard")
+    
+    # 현재 날짜 가져오기
+    current_date = datetime.date.today()
+
+    # Streamlit 앱에 현재 날짜 출력, 년-월-일 형식으로
+    st.subheader(current_date.strftime('%Y년 %m월 %d일'))
 
     # 홀 이름과 거리 설정
     holes = ['A1_Par4(62m)', 'A2_Par3(41m)', 'A3_Par4(67m)', 'A4_Par3(40m)', 
