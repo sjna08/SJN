@@ -3,9 +3,18 @@ import streamlit as st
 import pandas as pd
 import base64
 import io
+import datetime
 
-# Main Page
-st.title("ParkGolf ScoreCard")
+def app():
+    
+    # Main Page
+    st.title("YDP ScoreCard")
+
+    # 현재 날짜 가져오기
+    current_date = datetime.date.today()
+
+    # Streamlit 앱에 현재 날짜 출력, 년-월-일 형식으로
+    st.subheader(current_date.strftime('%Y년 %m월 %d일'))
 
 # Streamlit 앱 시작
 def app():
