@@ -74,24 +74,28 @@ def app():
     if st.button('제출'):
         df = pd.read_sql_query("SELECT * from scorecard", conn)
         df = df.pivot(index='player', columns='hole', values='score')
-        df['A'] = df.iloc[:, :9].sum(axis=1)
-        df['B'] = df.iloc[:, 9:18].sum(axis=1)
-        df['C'] = df.iloc[:, 18:27].sum(axis=1)
-        df['D'] = df.iloc[:, 27:].sum(axis=1)
-        df['TTL'] = df['A'] + df['B'] + df['C'] + df['D']
 
-        df['A_Dif'] = df['A'] - 33
-        df['B_Dif'] = df['B'] - 33
-        df['C_Dif'] = df['C'] - 33
-        df['D_Dif'] = df['D'] - 33
-        df['TTL_Dif'] = df['TTL'] - 132
+        summary = pd.DataFrame(index=players, columns=['TTL','A','B','C','D', 'A_Dif','B_Dif','C_Dif','D_Dif','TTL_Dif'])
+        summary['A'] = df.iloc[:, :9].sum(axis=1)
+        summary['B'] = df.iloc[:, 9:18].sum(axis=1)
+        summary['C'] = df.iloc[:, 18:27].sum(axis=1)
+        summary['D'] = df.iloc[:, 27:].sum(axis=1)
+        summary['TTL'] = summary['A'] + summary['B'] + summary['C'] + summary['D']
 
-        st.write(df.fillna(0).astype(int))
+        summary['A_Dif'] = summary['A'] - 33
+        summary['B_Dif'] = summary['B'] - 33
+        summary['C_Dif'] = summary['C'] - 33
+        summary['D_Dif'] = summary['D'] - 33
+        summary['TTL_Dif'] = summary['TTL'] - 132
+
+        full_df = pd.concat([summary, df], axis=1).fillna(0).astype(int)
+
+        st.write(full_df)
 
         excel_buffer = io.BytesIO()
         
         with pd.ExcelWriter(excel_buffer, engine='openpyxl') as writer:
-            df.to_excel(writer, index=True)
+            full_df.to_excel(writer, index=True)
 
         excel_data = excel_buffer.getvalue()
 
