@@ -120,3 +120,5 @@ def app():
     # Commit changes and close the connection to the database
     conn.commit()
     conn.close()
+
+if __name__ == "__main__":
