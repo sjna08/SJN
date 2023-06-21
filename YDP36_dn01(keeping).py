@@ -81,6 +81,47 @@ def app():
             """, (player, hole, score))
             conn.commit()
 
+      # Submit scores and calculate summary
+    if st.button('제출'):
+        summary = pd.DataFrame(index=players, columns=['TTL','A','B', 'A_Dif','B_Dif','C','D', 'C_Dif','D_Dif','TTL_Dif'])
+        summary['A'] = scorecard.iloc[:, :9].sum(axis=1)
+        summary['B'] = scorecard.iloc[:, 9:18].sum(axis=1)
+        summary['C'] = scorecard.iloc[:, 18:27].sum(axis=1)
+        summary['D'] = scorecard.iloc[:, 27:].sum(axis=1)
+        summary['TTL'] = summary['A'] + summary['B'] + summary['C'] + summary['D']
+
+        summary['A_Dif'] = summary['A'] - 33
+        summary['B_Dif'] = summary['B'] - 33
+        summary['C_Dif'] = summary['C'] - 33
+        summary['D_Dif'] = summary['D'] - 33
+        summary['TTL_Dif'] = summary['TTL'] - 132
+
+        st.write(summary.fillna(0).astype(int))
+        st.write(scorecard.fillna(0).astype(int))
+
+        full_scorecard = pd.concat([summary, scorecard], axis=1)
+
+         # Excel 파일을 메모리에 저장하기 위한 버퍼를 생성합니다.
+        excel_buffer = io.BytesIO()
+        
+        # DataFrame을 Excel 파일로 저장합니다.
+        with pd.ExcelWriter(excel_buffer, engine='openpyxl') as writer:
+            full_scorecard.to_excel(writer, index=True)
+
+        # 버퍼에 저장된 데이터를 가져옵니다.
+        excel_data = excel_buffer.getvalue()
+
+     # st.download_button을 이용해 excel 파일을 다운로드 링크로 제공합니다.
+        st.download_button(label='점수카드 다운로드',
+                        data=excel_data,
+                        file_name=f'점수카드_{current_date.strftime("%Y%m%d")}.xlsx',
+                        mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    
+    # Commit changes and close the connection to the database
+    conn.commit()
+    conn.close()
+
+
     # Reset scorecard after submission
     if st.button('제출'):
         conn.execute("DELETE FROM scorecard")
