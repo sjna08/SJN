@@ -46,18 +46,23 @@ def app():
             player TEXT,
             hole TEXT,
             score INTEGER,
-            PRIMARY KEY (player, hole)
-        )
+            PRIMARY KEY (player, hole))
     ''')
 
-    # Update player names and load existing scores
-    st.session_state['scorecard'] = pd.DataFrame(index=players, columns=holes)
-    for player in players:
-        for hole in holes:
-            # Try to load the score for this player and hole from the database
-            score = conn.execute('SELECT score FROM scorecard WHERE player = ? AND hole = ?', (player, hole)).fetchone()
-            if score is not None:
-                st.session_state['scorecard'].loc[player, hole] = score[0]
+    # Create or load scorecard
+    if 'scorecard' not in st.session_state:
+        st.session_state['scorecard'] = pd.DataFrame(index=players, columns=holes)
+
+        # Initialize scorecard from the database
+        for player in players:
+            for hole in holes:
+                # Fetch the score for this player and hole from the database
+                score = conn.execute('SELECT score FROM scorecard WHERE player = ? AND hole = ?', (player, hole)).fetchone()
+                if score is not None:
+                    st.session_state['scorecard'].loc[player, hole] = score[0]
+
+    # Update player names
+    st.session_state['scorecard'].index = players
 
     # Display scorecard for input
     scorecard = st.session_state['scorecard']
@@ -78,12 +83,40 @@ def app():
 
     # Submit scores and calculate summary
     if st.button('제출'):
-        # ... (나머지 코드는 원래와 동일하게 유지)
+        summary = pd.DataFrame(index=players, columns=['TTL','A','B', 'A_Dif','B_Dif','C','D', 'C_Dif','D_Dif','TTL_Dif'])
+        summary['A'] = scorecard.iloc[:, :9].sum(axis=1)
+        summary['B'] = scorecard.iloc[:, 9:18].sum(axis=1)
+        summary['C'] = scorecard.iloc[:, 18:27].sum(axis=1)
+        summary['D'] = scorecard.iloc[:, 27:].sum(axis=1)
+        summary['TTL'] = summary['A'] + summary['B'] + summary['C'] + summary['D']
 
-    # Save changes to the database and close the connection when the app is done
+        summary['A_Dif'] = summary['A'] - 33
+        summary['B_Dif'] = summary['B'] - 33
+        summary['C_Dif'] = summary['C'] - 33
+        summary['D_Dif'] = summary['D'] - 33
+        summary['TTL_Dif'] = summary['TTL'] - 132
+
+        st.write(summary.fillna(0).astype(int))
+        st.write(scorecard.fillna(0).astype(int))
+
+        full_scorecard = pd.concat([summary, scorecard], axis=1)
+
+         # Excel 파일을 메모리에 저장하기 위한 버퍼를 생성합니다.
+        excel_buffer = io.BytesIO()
+        
+        # DataFrame을 Excel 파일로 저장합니다.
+        with pd.ExcelWriter(excel_buffer, engine='openpyxl') as writer:
+            full_scorecard.to_excel(writer, index=True)
+
+        # 버퍼에 저장된 데이터를 가져옵니다.
+        excel_data = excel_buffer.getvalue()
+
+     # st.download_button을 이용해 excel 파일을 다운로드 링크로 제공합니다.
+        st.download_button(label='점수카드 다운로드',
+                        data=excel_data,
+                        file_name=f'점수카드_{current_date.strftime("%Y%m%d")}.xlsx',
+                        mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    
+    # Commit changes and close the connection to the database
     conn.commit()
     conn.close()
-
-
-if __name__ == "__main__":
-    app()
