@@ -1,16 +1,13 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
 import sqlite3
 import base64
 import io
 import datetime
 
 def app():
-    # Create a database in RAM
     conn = sqlite3.connect(':memory:', check_same_thread=False)
 
-    # Create table for scorecard
     conn.execute("""
         CREATE TABLE IF NOT EXISTS scorecard (
             player TEXT,
@@ -20,26 +17,21 @@ def app():
         )
     """)
 
-    # Create table for players
     conn.execute("""
         CREATE TABLE IF NOT EXISTS players (
             name TEXT
         )
     """)
 
-    # Delete all rows from players table
     conn.execute("DELETE FROM players")
     conn.commit()
 
     st.title("YDP ScoreCard")
 
-    # 현재 날짜 가져오기
     current_date = datetime.date.today()
 
-    # Streamlit 앱에 현재 날짜 출력, 년-월-일 형식으로
     st.subheader(current_date.strftime('%Y년 %m월 %d일'))
 
-    # 홀 이름과 거리 설정
     holes = ['A1_Par4(60m)', 'A2_Par3(40m)', 'A3_Par3(65m)', 'A4_Par4(100m)', 
             'A5_Par5(130m)', 'A6_Par4(72m)', 'A7_Par4(81m)', 'A8_Par3(50m)', 'A9_Par3(50m)', 
             'B1_Par3(69m)', 'B2_Par4(100m)', 'B3_Par4(68m)', 'B4_Par3(50m)', 
@@ -69,63 +61,49 @@ def app():
         st.markdown(hole_name, unsafe_allow_html=True)
 
         for player in players:
-            # Get score from the database
             score = conn.execute("SELECT score FROM scorecard WHERE player=? AND hole=?", (player, hole)).fetchone()
             score = score[0] if score else 0
             score = st.number_input(f'{player} {hole} 점수', min_value=0, value=int(score), key=f'{player}_{hole}', format="%d")
             
-            # Update or insert score in the database
             conn.execute("""
                 INSERT OR REPLACE INTO scorecard (player, hole, score)
                 VALUES (?, ?, ?)
             """, (player, hole, score))
             conn.commit()
 
-      # Submit scores and calculate summary
     if st.button('제출'):
-        summary = pd.DataFrame(index=players, columns=['TTL','A','B', 'A_Dif','B_Dif','C','D', 'C_Dif','D_Dif','TTL_Dif'])
-        summary['A'] = scorecard.iloc[:, :9].sum(axis=1)
-        summary['B'] = scorecard.iloc[:, 9:18].sum(axis=1)
-        summary['C'] = scorecard.iloc[:, 18:27].sum(axis=1)
-        summary['D'] = scorecard.iloc[:, 27:].sum(axis=1)
-        summary['TTL'] = summary['A'] + summary['B'] + summary['C'] + summary['D']
+        df = pd.read_sql_query("SELECT * from scorecard", conn)
+        df = df.pivot(index='player', columns='hole', values='score')
+        df['A'] = df.iloc[:, :9].sum(axis=1)
+        df['B'] = df.iloc[:, 9:18].sum(axis=1)
+        df['C'] = df.iloc[:, 18:27].sum(axis=1)
+        df['D'] = df.iloc[:, 27:].sum(axis=1)
+        df['TTL'] = df['A'] + df['B'] + df['C'] + df['D']
 
-        summary['A_Dif'] = summary['A'] - 33
-        summary['B_Dif'] = summary['B'] - 33
-        summary['C_Dif'] = summary['C'] - 33
-        summary['D_Dif'] = summary['D'] - 33
-        summary['TTL_Dif'] = summary['TTL'] - 132
+        df['A_Dif'] = df['A'] - 33
+        df['B_Dif'] = df['B'] - 33
+        df['C_Dif'] = df['C'] - 33
+        df['D_Dif'] = df['D'] - 33
+        df['TTL_Dif'] = df['TTL'] - 132
 
-        st.write(summary.fillna(0).astype(int))
-        st.write(scorecard.fillna(0).astype(int))
+        st.write(df.fillna(0).astype(int))
 
-        full_scorecard = pd.concat([summary, scorecard], axis=1)
-
-         # Excel 파일을 메모리에 저장하기 위한 버퍼를 생성합니다.
         excel_buffer = io.BytesIO()
         
-        # DataFrame을 Excel 파일로 저장합니다.
         with pd.ExcelWriter(excel_buffer, engine='openpyxl') as writer:
-            full_scorecard.to_excel(writer, index=True)
+            df.to_excel(writer, index=True)
 
-        # 버퍼에 저장된 데이터를 가져옵니다.
         excel_data = excel_buffer.getvalue()
 
-     # st.download_button을 이용해 excel 파일을 다운로드 링크로 제공합니다.
         st.download_button(label='점수카드 다운로드',
                         data=excel_data,
                         file_name=f'점수카드_{current_date.strftime("%Y%m%d")}.xlsx',
                         mime='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     
-    # Commit changes and close the connection to the database
-    conn.commit()
-    conn.close()
-
-
-    # Reset scorecard after submission
-    if st.button('제출'):
         conn.execute("DELETE FROM scorecard")
         conn.commit()
+
+    conn.close()
 
 if __name__ == "__main__":
     app()
