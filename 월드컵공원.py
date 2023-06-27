@@ -6,7 +6,7 @@ import io
 import datetime
 
 def app():
-    st.title("심학산 ScoreCard")
+    st.title("월드컵 ScoreCard")
     
     # 현재 날짜 가져오기
     current_date = datetime.date.today()
