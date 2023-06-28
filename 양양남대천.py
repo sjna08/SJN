@@ -16,7 +16,7 @@ def app():
     st.subheader(current_date.strftime('%Y년 %m월 %d일'))
 
     # 홀 이름과 거리 설정
-     holes = ['A1_Par4(100m)', 'A2_Par4(100m)', 'A3_Par3(60m)', 'A4_Par4(55m)', 
+    holes = ['A1_Par4(100m)', 'A2_Par4(100m)', 'A3_Par3(60m)', 'A4_Par4(55m)', 
             'A5_Par5(150m)', 'A6_Par4(100m)', 'A7_Par3(55m)', 'A8_Par3(50m)', 'A9_Par4(100m)', 
             'B1_Par3(55m)', 'B2_Par3(55m)', 'B3_Par3(55m)', 'B4_Par4(100m)', 
             'B5_Par4(100m)', 'B6_Par3(55m)', 'B7_Par4(100m)', 'B8_Par4(100m)', 'B9_Par5(150m)',
